@@ -48,7 +48,7 @@ function execAsync(script: string) {
 const latestVersions: { [name: string]: string } = {};
 async function canUpdate(project: string, dependencyName: string) {
     if (!latestVersions[dependencyName]) {
-        latestVersions[dependencyName] = (await execAsync(`npm view ${dependencyName} dist-tags.latest`)).trim();
+        latestVersions[dependencyName] = (await execAsync(`npm view ${dependencyName} dist-tags.latest --registry=https://registry.npm.taobao.org`)).trim();
     }
     const packageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`./${project}/node_modules/${dependencyName}/package.json`).toString());
     return latestVersions[dependencyName] !== packageJsonContent.version;
