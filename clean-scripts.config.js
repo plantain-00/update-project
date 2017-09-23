@@ -16,7 +16,10 @@ module.exports = {
   test: [
     'tsc -p spec',
     'jasmine',
-    `node dist/index.js "demo" --exclude "test" --lib "no-unused-export" --exclude-lib "uglify-js" --supressError > spec/result.txt`,
+    [
+      'cd demo && yarn',
+      `node dist/index.js "demo" --exclude "test" --lib "no-unused-export" --exclude-lib "uglify-js" --supressError > spec/result.txt`
+    ],
     async () => {
       const { stdout } = await execAsync('git status -s')
       if (stdout) {
