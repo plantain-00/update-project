@@ -71,8 +71,10 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
             if (libraries.length > 0) {
                 await execAsync(`cd ${project} && yarn add ${libraries.map(d => d + "@" + latestVersions[d]).join(" ")} -E ${parameter}`);
             }
+            return libraries.length;
         }
     }
+    return 0;
 }
 
 async function executeCommandLine() {
@@ -112,10 +114,10 @@ async function executeCommandLine() {
                     return dependencyArray;
                 }
             }
-            await updateDependencies(packageJsonContent => packageJsonContent.dependencies, "", project, getLibraries);
-            await updateDependencies(packageJsonContent => packageJsonContent.devDependencies, "-D", project, getLibraries);
+            const dependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.dependencies, "", project, getLibraries);
+            const devDependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.devDependencies, "-D", project, getLibraries);
 
-            if (argv.commit) {
+            if (argv.commit && dependencyCount + devDependencyCount > 0) {
                 await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "update dependencies" && git push`);
             }
         } catch (error) {
