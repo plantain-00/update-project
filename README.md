@@ -14,4 +14,4 @@ A CLI tool to update dependencies for projects.
 
 #### usage
 
-run `update-project "**" --exclude "test" --lib "no-unused-export" --exclude-lib "uglify-js" --commit`
+run `update-project ** --exclude "test" --lib "no-unused-export" --exclude-lib "uglify-js" --commit`
