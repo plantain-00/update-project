@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "no-unused-export": "1.2.7"
+    "no-unused-export": "1.3.0"
   }
 }
