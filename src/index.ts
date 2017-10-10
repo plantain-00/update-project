@@ -2,6 +2,7 @@ import * as minimist from "minimist";
 import * as glob from "glob";
 import * as fs from "fs";
 import * as childProcess from "child_process";
+import * as core from "./core";
 import * as packageJson from "../package.json";
 
 let suppressError = false;
@@ -46,13 +47,6 @@ function execAsync(script: string) {
 }
 
 const latestVersions: { [name: string]: string } = {};
-async function canUpdate(project: string, dependencyName: string) {
-    if (!latestVersions[dependencyName]) {
-        latestVersions[dependencyName] = (await execAsync(`npm view ${dependencyName} dist-tags.latest --registry=https://registry.npm.taobao.org`)).trim();
-    }
-    const packageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`./${project}/node_modules/${dependencyName}/package.json`).toString());
-    return latestVersions[dependencyName] !== packageJsonContent.version;
-}
 
 async function updateDependencies(getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, getLibraries: (dependencyArray: string[]) => string[]) {
     const packageJsonPath = `./${project}/package.json`;
@@ -62,14 +56,21 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
         const dependencyArray = Object.keys(dependencyObject);
         if (dependencyArray.length > 0) {
             const allLibraries = getLibraries(dependencyArray);
-            const libraries: string[] = [];
+            const libraries: { name: string, version: string }[] = [];
             for (const lib of allLibraries) {
-                if (await canUpdate(project, lib)) {
-                    libraries.push(lib);
+                if (!latestVersions[lib]) {
+                    latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`)).trim();
+                }
+                const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`./${project}/node_modules/${lib}/package.json`).toString());
+                if (latestVersions[lib] !== dependencyPackageJsonContent.version) {
+                    libraries.push({
+                        name: lib,
+                        version: core.getUpdatedVersion(dependencyObject[lib], latestVersions[lib]),
+                    });
                 }
             }
             if (libraries.length > 0) {
-                await execAsync(`cd ${project} && yarn add ${libraries.map(d => d + "@" + latestVersions[d]).join(" ")} -E ${parameter}`);
+                await execAsync(`cd ${project} && yarn add ${libraries.map(d => d.name + "@" + d.version).join(" ")} -E ${parameter}`);
             }
             return libraries.length;
         }

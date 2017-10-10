@@ -9,7 +9,7 @@ module.exports = {
     'tsc -p src/',
     [
       'cd demo && yarn',
-      `node dist/index.js "demo" --exclude "test" --lib "no-unused-export" --exclude-lib "uglify-js" --supressError > spec/result.txt`
+      `node dist/index.js "demo" --exclude "test" --supressError > spec/result.txt`
     ]
   ],
   lint: {
