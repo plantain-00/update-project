@@ -213,16 +213,16 @@ minimist@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
 
-no-unused-export@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/no-unused-export/-/no-unused-export-1.3.0.tgz#3b8c48f27041e1f47cea69088dcbb3e15b20230a"
+no-unused-export@1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/no-unused-export/-/no-unused-export-1.4.0.tgz#4f16bbdc3f13a693a08c0b9dee7f81ca48118e1c"
   dependencies:
     glob "7.1.2"
     minimist "1.2.0"
     parse5 "3.0.2"
     postcss-less "1.1.0"
     postcss-scss "1.0.2"
-    typescript "2.5.2"
+    typescript "2.5.3"
 
 once@^1.3.0:
   version "1.4.0"
@@ -334,9 +334,9 @@ tslib@1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.7.1.tgz#bc8004164691923a79fe8378bbeb3da2017538ec"
 
-typescript@2.5.2:
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.2.tgz#038a95f7d9bbb420b1bf35ba31d4c5c1dd3ffe34"
+typescript@2.5.3:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.3.tgz#df3dcdc38f3beb800d4bc322646b04a3f6ca7f0d"
 
 uglify-js@2:
   version "2.8.29"
