@@ -109,28 +109,26 @@ async function executeCommandLine() {
     for (const project of projects) {
         printInConsole(`${project}...`);
         try {
-            if (argv.reinstall) {
-                await rimrafAsync(`./${project}/node_modules`);
-                await rimrafAsync(`./${project}/yarn.lock`);
-                await execAsync(`cd ${project} && yarn`);
-            } else {
-                function getLibraries(dependencyArray: string[]) {
-                    if (argv.lib) {
-                        const libraries = Array.isArray(argv.lib) ? argv.lib : [argv.lib];
-                        return dependencyArray.filter(d => libraries.includes(d));
-                    } else if (argv["exclude-lib"]) {
-                        const excludedLibraries = Array.isArray(argv["exclude-lib"]) ? argv["exclude-lib"] : [argv["exclude-lib"]];
-                        return dependencyArray.filter(d => !excludedLibraries.includes(d));
-                    } else {
-                        return dependencyArray;
-                    }
+            function getLibraries(dependencyArray: string[]) {
+                if (argv.lib) {
+                    const libraries = Array.isArray(argv.lib) ? argv.lib : [argv.lib];
+                    return dependencyArray.filter(d => libraries.includes(d));
+                } else if (argv["exclude-lib"]) {
+                    const excludedLibraries = Array.isArray(argv["exclude-lib"]) ? argv["exclude-lib"] : [argv["exclude-lib"]];
+                    return dependencyArray.filter(d => !excludedLibraries.includes(d));
+                } else {
+                    return dependencyArray;
                 }
-                const dependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.dependencies, "", project, getLibraries);
-                const devDependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.devDependencies, "-D", project, getLibraries);
+            }
+            const dependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.dependencies, "", project, getLibraries);
+            const devDependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.devDependencies, "-D", project, getLibraries);
 
-                if (argv.commit && dependencyCount + devDependencyCount > 0) {
-                    await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "update dependencies" && git push`);
-                }
+            await rimrafAsync(`./${project}/node_modules`);
+            await rimrafAsync(`./${project}/yarn.lock`);
+            await execAsync(`cd ${project} && yarn`);
+
+            if (argv.commit && dependencyCount + devDependencyCount > 0) {
+                await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "update dependencies" && git push`);
             }
         } catch (error) {
             printInConsole(error);
