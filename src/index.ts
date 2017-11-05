@@ -106,8 +106,9 @@ async function executeCommandLine() {
     }
 
     const erroredProjects: string[] = [];
-    for (const project of projects) {
-        printInConsole(`${project}...`);
+    for (let i = 0; i < projects.length; i++) {
+        const project = projects[i];
+        printInConsole(`${i + 1} / ${projects.length} ${project}...`);
         try {
             function getLibraries(dependencyArray: string[]) {
                 if (argv.lib) {
@@ -136,9 +137,9 @@ async function executeCommandLine() {
                 erroredProjects.push(project);
             }
         }
+        printInConsole("Errored Projects:");
+        printInConsole(erroredProjects);
     }
-    printInConsole("Errored Projects:");
-    printInConsole(erroredProjects);
 }
 
 executeCommandLine().then(() => {
