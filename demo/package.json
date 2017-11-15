@@ -10,9 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "*",
-    "no-unused-export": "1.4.1",
+    "no-unused-export": "1.4.2",
     "perfect-scrollbar": "1",
-    "select2-component": "3",
+    "select2-component": "4",
     "tslib": "1",
     "uglify-js": "2",
     "xlsx": "0.11"
