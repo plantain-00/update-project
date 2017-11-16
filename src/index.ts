@@ -52,8 +52,9 @@ function execAsync(script: string) {
 }
 
 const latestVersions: { [name: string]: string } = {};
+type Library = { name: string, version: string };
 
-async function updateDependencies(getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, getLibraries: (dependencyArray: string[]) => string[]) {
+async function updateDependencies(getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, getLibraries: (dependencyArray: string[]) => string[], check: boolean): Promise<Library[]> {
     const packageJsonPath = `./${project}/package.json`;
     const packageJsonContent: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString());
     const dependencyObject = getDependencies(packageJsonContent);
@@ -61,7 +62,7 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
         const dependencyArray = Object.keys(dependencyObject);
         if (dependencyArray.length > 0) {
             const allLibraries = getLibraries(dependencyArray);
-            const libraries: { name: string, version: string }[] = [];
+            const libraries: Library[] = [];
             for (const lib of allLibraries) {
                 if (!latestVersions[lib]) {
                     latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`)).trim();
@@ -74,13 +75,13 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
                     });
                 }
             }
-            if (libraries.length > 0) {
+            if (libraries.length > 0 && !check) {
                 await execAsync(`cd ${project} && yarn add ${libraries.map(d => d.name + "@" + d.version).join(" ")} -E ${parameter}`);
             }
-            return libraries.length;
+            return libraries;
         }
     }
-    return 0;
+    return [];
 }
 
 async function executeCommandLine() {
@@ -106,6 +107,7 @@ async function executeCommandLine() {
     }
 
     const erroredProjects: string[] = [];
+    const allLibraries: Library[] = [];
     for (let i = 0; i < projects.length; i++) {
         const project = projects[i];
         printInConsole(`${i + 1} / ${projects.length} ${project}...`);
@@ -121,15 +123,28 @@ async function executeCommandLine() {
                     return dependencyArray;
                 }
             }
-            const dependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.dependencies, "", project, getLibraries);
-            const devDependencyCount = await updateDependencies(packageJsonContent => packageJsonContent.devDependencies, "-D", project, getLibraries);
+            const dependencies = await updateDependencies(packageJsonContent => packageJsonContent.dependencies, "", project, getLibraries, argv.check);
+            const devDependencies = await updateDependencies(packageJsonContent => packageJsonContent.devDependencies, "-D", project, getLibraries, argv.check);
 
-            await rimrafAsync(`./${project}/node_modules`);
-            await rimrafAsync(`./${project}/yarn.lock`);
-            await execAsync(`cd ${project} && yarn`);
+            if (!argv.check) {
+                await rimrafAsync(`./${project}/node_modules`);
+                await rimrafAsync(`./${project}/yarn.lock`);
+                await execAsync(`cd ${project} && yarn`);
 
-            if (argv.commit && dependencyCount + devDependencyCount > 0) {
-                await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "update dependencies" && git push`);
+                if (argv.commit && dependencies.length + devDependencies.length > 0) {
+                    await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "update dependencies" && git push`);
+                }
+            } else {
+                for (const dependency of dependencies) {
+                    if (allLibraries.every(a => a.name !== dependency.name)) {
+                        allLibraries.push(dependency);
+                    }
+                }
+                for (const dependency of devDependencies) {
+                    if (allLibraries.every(a => a.name !== dependency.name)) {
+                        allLibraries.push(dependency);
+                    }
+                }
             }
         } catch (error) {
             printInConsole(error);
@@ -137,8 +152,12 @@ async function executeCommandLine() {
                 erroredProjects.push(project);
             }
         }
-        printInConsole("Errored Projects:");
+        printInConsole(`Errored ${erroredProjects.length} Projects:`);
         printInConsole(erroredProjects);
+        printInConsole(`Outdated ${allLibraries.length} Libraries:`);
+        for (const library of allLibraries) {
+            printInConsole(`${library.name}@${library.version}`);
+        }
     }
 }
 
