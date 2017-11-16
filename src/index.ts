@@ -152,12 +152,12 @@ async function executeCommandLine() {
                 erroredProjects.push(project);
             }
         }
-        printInConsole(`Errored ${erroredProjects.length} Projects:`);
-        printInConsole(erroredProjects);
-        printInConsole(`Outdated ${allLibraries.length} Libraries:`);
-        for (const library of allLibraries) {
-            printInConsole(`${library.name}@${library.version}`);
-        }
+    }
+    printInConsole(`Errored ${erroredProjects.length} Projects:`);
+    printInConsole(erroredProjects);
+    printInConsole(`Outdated ${allLibraries.length} Libraries:`);
+    for (const library of allLibraries) {
+        printInConsole(`${library.name}@${library.version}`);
     }
 }
 
