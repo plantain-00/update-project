@@ -132,7 +132,7 @@ async function executeCommandLine() {
                 await execAsync(`cd ${project} && yarn`);
 
                 if (argv.commit && dependencies.length + devDependencies.length > 0) {
-                    await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "update dependencies" && git push`);
+                    await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "feat: update dependencies" && git push`);
                 }
             } else {
                 for (const dependency of dependencies) {
