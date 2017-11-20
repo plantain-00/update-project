@@ -14,7 +14,7 @@
     "perfect-scrollbar": "1",
     "select2-component": "4",
     "tslib": "1",
-    "uglify-js": "2",
+    "uglify-js": "^2.8",
     "xlsx": "0.11"
   }
 }
