@@ -1,6 +1,6 @@
 {
   "name": "update-project",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A CLI tool to update dependencies for projects.",
   "main": "index.js",
   "scripts": {
@@ -35,6 +35,7 @@
     "typescript": "2.6.1"
   },
   "dependencies": {
+    "chalk": "2.3.0",
     "glob": "7.1.2",
     "minimist": "1.2.0",
     "rimraf": "2.6.2"

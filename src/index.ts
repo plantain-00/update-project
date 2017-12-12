@@ -5,6 +5,7 @@ import * as childProcess from "child_process";
 import * as rimraf from "rimraf";
 import * as core from "./core";
 import * as util from "util";
+import chalk from "chalk";
 
 import * as packageJson from "../package.json";
 
@@ -12,7 +13,8 @@ let suppressError = false;
 
 function printInConsole(message: any) {
     if (message instanceof Error) {
-        message = message.message;
+        printInConsole(chalk.red(message.message));
+        return;
     }
     // tslint:disable-next-line:no-console
     console.log(message);
@@ -148,7 +150,7 @@ async function executeCommandLine() {
     const allLibraries: Library[] = [];
     for (let i = 0; i < projects.length; i++) {
         const project = projects[i];
-        printInConsole(`${i + 1} / ${projects.length} ${project}...`);
+        printInConsole(chalk.bold(`${i + 1} / ${projects.length} ${project}...`));
         try {
             const dependencies = await updateDependencies(p => p.dependencies, "", project, project, argv);
             const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, project, argv);
@@ -186,16 +188,18 @@ async function executeCommandLine() {
             }
         }
     }
-    printInConsole(`Errored ${erroredProjects.length} Projects:`);
-    printInConsole(erroredProjects);
-    printInConsole(`Outdated ${allLibraries.length} Libraries:`);
+    printInConsole(chalk.bold(`Errored ${erroredProjects.length} Projects:`));
+    for (const project of erroredProjects) {
+        printInConsole(chalk.red(project));
+    }
+    printInConsole(chalk.bold(`Outdated ${allLibraries.length} Libraries:`));
     for (const library of allLibraries) {
         printInConsole(`${library.name}@${library.version}`);
     }
 }
 
 executeCommandLine().then(() => {
-    printInConsole("update-project success.");
+    printInConsole(chalk.green("update-project success."));
 }, error => {
     printInConsole(error);
     if (!suppressError) {
