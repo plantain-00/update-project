@@ -11,17 +11,8 @@ import * as packageJson from "../package.json";
 
 let suppressError = false;
 
-function printInConsole(message: any) {
-    if (message instanceof Error) {
-        printInConsole(chalk.red(message.message));
-        return;
-    }
-    // tslint:disable-next-line:no-console
-    console.log(message);
-}
-
 function showToolVersion() {
-    printInConsole(`Version: ${packageJson.version}`);
+    console.log(`Version: ${packageJson.version}`);
 }
 
 const rimrafAsync = util.promisify(rimraf);
@@ -39,7 +30,7 @@ function globAsync(pattern: string, ignore?: string | string[]) {
 }
 
 function execAsync(script: string) {
-    printInConsole(`${script}...`);
+    console.log(`${script}...`);
     return new Promise<string>((resolve, reject) => {
         const subProcess = childProcess.exec(script, (error, stdout) => {
             if (error) {
@@ -150,7 +141,7 @@ async function executeCommandLine() {
     const allLibraries: Library[] = [];
     for (let i = 0; i < projects.length; i++) {
         const project = projects[i];
-        printInConsole(chalk.bold(`${i + 1} / ${projects.length} ${project}...`));
+        console.log(chalk.bold(`${i + 1} / ${projects.length} ${project}...`));
         try {
             const dependencies = await updateDependencies(p => p.dependencies, "", project, project, argv);
             const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, project, argv);
@@ -182,26 +173,30 @@ async function executeCommandLine() {
                 }
             }
         } catch (error) {
-            printInConsole(error);
+            console.log(error);
             if (error.code !== 0) {
                 erroredProjects.push(project);
             }
         }
     }
-    printInConsole(chalk.bold(`Errored ${erroredProjects.length} Projects:`));
+    console.log(chalk.bold(`Errored ${erroredProjects.length} Projects:`));
     for (const project of erroredProjects) {
-        printInConsole(chalk.red(project));
+        console.log(chalk.red(project));
     }
-    printInConsole(chalk.bold(`Outdated ${allLibraries.length} Libraries:`));
+    console.log(chalk.bold(`Outdated ${allLibraries.length} Libraries:`));
     for (const library of allLibraries) {
-        printInConsole(`${library.name}@${library.version}`);
+        console.log(`${library.name}@${library.version}`);
     }
 }
 
 executeCommandLine().then(() => {
-    printInConsole(chalk.green("update-project success."));
+    console.log(chalk.green("update-project success."));
 }, error => {
-    printInConsole(error);
+    if (error instanceof Error) {
+        console.log(error.message);
+    } else {
+        console.log(error);
+    }
     if (!suppressError) {
         process.exit(1);
     }
