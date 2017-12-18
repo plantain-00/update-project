@@ -29,8 +29,8 @@ function globAsync(pattern: string, ignore?: string | string[]) {
     });
 }
 
-function execAsync(script: string) {
-    console.log(`${script}...`);
+function execAsync(script: string, progressText: string) {
+    console.log(chalk.bold(`${progressText}: ${script}...`));
     return new Promise<string>((resolve, reject) => {
         const subProcess = childProcess.exec(script, (error, stdout) => {
             if (error) {
@@ -59,7 +59,7 @@ function getLibraries(dependencyArray: string[], argv: minimist.ParsedArgs) {
     }
 }
 
-async function updateDependencies(getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, projectPath: string, argv: minimist.ParsedArgs): Promise<Library[]> {
+async function updateDependencies(getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, projectPath: string, argv: minimist.ParsedArgs, progressText: string): Promise<Library[]> {
     const packageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/package.json`).toString());
     const dependencyObject = getDependencies(packageJsonContent);
     const libraries: Library[] = [];
@@ -67,12 +67,13 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
         const dependencyArray = Object.keys(dependencyObject);
         if (dependencyArray.length > 0) {
             const allLibraries = getLibraries(dependencyArray, argv);
-            for (const lib of allLibraries) {
+            for (let i = 0; i < allLibraries.length; i++) {
+                const lib = allLibraries[i];
                 if (lib === project) {
                     continue;
                 }
                 if (!latestVersions[lib]) {
-                    latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`)).trim();
+                    latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`, `${i + 1} / ${allLibraries.length}`)).trim();
                 }
                 const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString());
                 if (latestVersions[lib] !== dependencyPackageJsonContent.version) {
@@ -83,24 +84,24 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
                 }
             }
             if (libraries.length > 0 && !argv.check) {
-                await execAsync(`cd ${projectPath} && yarn add ${libraries.map(d => d.name + "@" + d.version).join(" ")} -E ${parameter}`);
+                await execAsync(`cd ${projectPath} && yarn add ${libraries.map(d => d.name + "@" + d.version).join(" ")} -E ${parameter}`, progressText);
             }
         }
     }
     return libraries;
 }
 
-async function updateChildDependencies(project: string, argv: minimist.ParsedArgs): Promise<Library[]> {
+async function updateChildDependencies(project: string, argv: minimist.ParsedArgs, progressText: string): Promise<Library[]> {
     const libraries: Library[] = [];
     if (fs.existsSync(`./${project}/packages/`)) {
         const files = fs.readdirSync(`./${project}/packages/`);
         for (const subProject of files) {
             const newPath = `./${project}/packages/${subProject}`;
             if (fs.statSync(newPath).isDirectory() && fs.statSync(`${newPath}/package.json`).isFile()) {
-                const dependencies = await updateDependencies(p => p.dependencies, "", project, newPath, argv);
+                const dependencies = await updateDependencies(p => p.dependencies, "", project, newPath, argv, `${progressText} ${subProject} dependency`);
                 libraries.push(...dependencies);
 
-                const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, newPath, argv);
+                const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, newPath, argv, `${progressText} ${subProject} devDependency`);
                 libraries.push(...devDependencies);
 
                 if (!argv.check) {
@@ -110,7 +111,7 @@ async function updateChildDependencies(project: string, argv: minimist.ParsedArg
             }
         }
 
-        await execAsync(`cd ${project} && lerna bootstrap`);
+        await execAsync(`cd ${project} && lerna bootstrap`, progressText);
     }
     return libraries;
 }
@@ -141,19 +142,20 @@ async function executeCommandLine() {
     const allLibraries: Library[] = [];
     for (let i = 0; i < projects.length; i++) {
         const project = projects[i];
-        console.log(chalk.bold(`${i + 1} / ${projects.length} ${project}...`));
+        const progressText = `${i + 1} / ${projects.length}`;
+        console.log(chalk.bold(`${progressText} ${project}...`));
         try {
-            const dependencies = await updateDependencies(p => p.dependencies, "", project, project, argv);
-            const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, project, argv);
-            const childDependencies = await updateChildDependencies(project, argv);
+            const dependencies = await updateDependencies(p => p.dependencies, "", project, project, argv, `${progressText} ${project} dependency`);
+            const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, project, argv, `${progressText} ${project} devDependency`);
+            const childDependencies = await updateChildDependencies(project, argv, `${progressText} ${project} packages`);
 
             if (!argv.check) {
                 await rimrafAsync(`./${project}/node_modules`);
                 await rimrafAsync(`./${project}/yarn.lock`);
-                await execAsync(`cd ${project} && yarn`);
+                await execAsync(`cd ${project} && yarn`, `${progressText} ${project}`);
 
                 if (argv.commit && dependencies.length + devDependencies.length + childDependencies.length > 0) {
-                    await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "feat: update dependencies" && git push`);
+                    await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "feat: update dependencies" && git push`, `${progressText} ${project}`);
                 }
             } else {
                 for (const dependency of dependencies) {
