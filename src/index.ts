@@ -73,7 +73,7 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
                     continue;
                 }
                 if (!latestVersions[lib]) {
-                    latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`, `${i + 1} / ${allLibraries.length}`)).trim();
+                    latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`, `${progressText} ${i + 1} / ${allLibraries.length}`)).trim();
                 }
                 const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString());
                 if (latestVersions[lib] !== dependencyPackageJsonContent.version) {
