@@ -104,6 +104,9 @@ async function updateChildDependencies(project: string, argv: minimist.ParsedArg
                 const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, newPath, argv, `${progressText} ${subProject} devDependency`);
                 libraries.push(...devDependencies);
 
+                const peerDependencies = await updateDependencies(p => p.peerDependencies, "-P", project, newPath, argv, `${progressText} ${subProject} peerDependency`);
+                libraries.push(...peerDependencies);
+
                 if (!argv.check) {
                     await rimrafAsync(`${newPath}/node_modules`);
                     await rimrafAsync(`${newPath}/yarn.lock`);
@@ -147,6 +150,7 @@ async function executeCommandLine() {
         try {
             const dependencies = await updateDependencies(p => p.dependencies, "", project, project, argv, `${progressText} ${project} dependency`);
             const devDependencies = await updateDependencies(p => p.devDependencies, "-D", project, project, argv, `${progressText} ${project} devDependency`);
+            const peerDependencies = await updateDependencies(p => p.peerDependencies, "-P", project, project, argv, `${progressText} ${project} peerDependency`);
             const childDependencies = await updateChildDependencies(project, argv, `${progressText} ${project} packages`);
 
             if (!argv.check) {
@@ -154,7 +158,7 @@ async function executeCommandLine() {
                 await rimrafAsync(`./${project}/yarn.lock`);
                 await execAsync(`cd ${project} && yarn`, `${progressText} ${project}`);
 
-                if (argv.commit && dependencies.length + devDependencies.length + childDependencies.length > 0) {
+                if (argv.commit && dependencies.length + devDependencies.length + peerDependencies.length + childDependencies.length > 0) {
                     await execAsync(`cd ${project} && npm run build &&  npm run lint && git add -A && git commit -m "feat: update dependencies" && git push`, `${progressText} ${project}`);
                 }
             } else {
@@ -164,6 +168,11 @@ async function executeCommandLine() {
                     }
                 }
                 for (const dependency of devDependencies) {
+                    if (allLibraries.every(a => a.name !== dependency.name)) {
+                        allLibraries.push(dependency);
+                    }
+                }
+                for (const dependency of peerDependencies) {
                     if (allLibraries.every(a => a.name !== dependency.name)) {
                         allLibraries.push(dependency);
                     }
@@ -207,5 +216,6 @@ executeCommandLine().then(() => {
 type PackageJson = {
     dependencies: { [name: string]: string };
     devDependencies: { [name: string]: string };
+    peerDependencies: { [name: string]: string };
     version: string;
 };
