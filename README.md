@@ -12,7 +12,7 @@ A CLI tool to update dependencies for projects.
 
 ## install
 
-`yarn add update-project -g`
+`yarn global add update-project`
 
 ## usage
 
