@@ -11,13 +11,13 @@ import * as packageJson from '../package.json'
 
 let suppressError = false
 
-function showToolVersion () {
+function showToolVersion() {
   console.log(`Version: ${packageJson.version}`)
 }
 
 const rimrafAsync = util.promisify(rimraf)
 
-function globAsync (pattern: string, ignore?: string | string[]) {
+function globAsync(pattern: string, ignore?: string | string[]) {
   return new Promise<string[]>((resolve, reject) => {
     glob(pattern, { ignore }, (error, matches) => {
       if (error) {
@@ -29,7 +29,7 @@ function globAsync (pattern: string, ignore?: string | string[]) {
   })
 }
 
-function execAsync (script: string, progressText: string) {
+function execAsync(script: string, progressText: string) {
   console.log(chalk.bold(`${progressText}: ${script}...`))
   return new Promise<string>((resolve, reject) => {
     const subProcess = childProcess.exec(script, (error, stdout) => {
@@ -47,19 +47,22 @@ function execAsync (script: string, progressText: string) {
 const latestVersions: { [name: string]: string } = {}
 type Library = { name: string, version: string }
 
-function getLibraries (dependencyArray: string[], argv: minimist.ParsedArgs) {
+const excludeLibName = 'exclude-lib'
+
+function getLibraries(dependencyArray: string[], argv: minimist.ParsedArgs) {
   if (argv.lib) {
     const libraries = Array.isArray(argv.lib) ? argv.lib : [argv.lib]
     return dependencyArray.filter(d => libraries.includes(d))
-  } else if (argv['exclude-lib']) {
-    const excludedLibraries = Array.isArray(argv['exclude-lib']) ? argv['exclude-lib'] : [argv['exclude-lib']]
+  } else if (argv[excludeLibName]) {
+    const excludedLibraries = Array.isArray(argv[excludeLibName]) ? argv[excludeLibName] : [argv[excludeLibName]]
     return dependencyArray.filter(d => !excludedLibraries.includes(d))
   } else {
     return dependencyArray
   }
 }
 
-async function updateDependencies (getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, projectPath: string, argv: minimist.ParsedArgs, progressText: string): Promise<Library[]> {
+// tslint:disable-next-line:cognitive-complexity
+async function updateDependencies(getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, projectPath: string, argv: minimist.ParsedArgs, progressText: string): Promise<Library[]> {
   const packageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/package.json`).toString())
   const dependencyObject = getDependencies(packageJsonContent)
   const libraries: Library[] = []
@@ -91,7 +94,7 @@ async function updateDependencies (getDependencies: (packageJsonContent: Package
   return libraries
 }
 
-async function updateChildDependencies (project: string, argv: minimist.ParsedArgs, progressText: string): Promise<Library[]> {
+async function updateChildDependencies(project: string, argv: minimist.ParsedArgs, progressText: string): Promise<Library[]> {
   const libraries: Library[] = []
   if (fs.existsSync(`./${project}/packages/`)) {
     const files = fs.readdirSync(`./${project}/packages/`)
@@ -119,7 +122,8 @@ async function updateChildDependencies (project: string, argv: minimist.ParsedAr
   return libraries
 }
 
-async function executeCommandLine () {
+// tslint:disable-next-line:cognitive-complexity
+async function executeCommandLine() {
   const argv = minimist(process.argv.slice(2), { '--': true })
 
   const showVersion = argv.v || argv.version
