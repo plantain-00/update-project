@@ -9,7 +9,7 @@ module.exports = {
   ],
   postScript: [
     'cd "[dir]" && yarn --production',
-    '[dir]/bin/update-project "demo" --exclude "test" --exclude-lib "uglify-js" --check',
-    '[dir]/bin/update-project "demo" --exclude "test" --exclude-lib "uglify-js"'
+    'node [dir]/dist/index.js "demo" --exclude "test" --exclude-lib "uglify-js" --check',
+    'node [dir]/dist/index.js "demo" --exclude "test" --exclude-lib "uglify-js"'
   ]
 }
