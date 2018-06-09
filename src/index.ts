@@ -78,12 +78,16 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
         if (!latestVersions[lib]) {
           latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`, `${progressText} ${i + 1} / ${allLibraries.length}`)).trim()
         }
-        const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString())
-        if (latestVersions[lib] !== dependencyPackageJsonContent.version) {
-          libraries.push({
-            name: lib,
-            version: core.getUpdatedVersion(dependencyObject[lib], latestVersions[lib])
-          })
+        try {
+          const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString())
+          if (latestVersions[lib] !== dependencyPackageJsonContent.version) {
+            libraries.push({
+              name: lib,
+              version: core.getUpdatedVersion(dependencyObject[lib], latestVersions[lib])
+            })
+          }
+        } catch (error) {
+          // do nothing if one package fails to update
         }
       }
       if (libraries.length > 0 && !argv.check) {
