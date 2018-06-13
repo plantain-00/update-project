@@ -6,6 +6,7 @@ import rimraf from 'rimraf'
 import * as core from './core'
 import * as util from 'util'
 import chalk from 'chalk'
+import * as semver from 'semver'
 
 import * as packageJson from '../package.json'
 
@@ -44,7 +45,7 @@ function execAsync(script: string, progressText: string) {
   })
 }
 
-const latestVersions: { [name: string]: string } = {}
+const latestVersions: { [name: string]: { [tag: string]: string } } = {}
 type Library = { name: string, version: string }
 
 const excludeLibName = 'exclude-lib'
@@ -76,22 +77,31 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
           continue
         }
         if (!latestVersions[lib]) {
-          latestVersions[lib] = (await execAsync(`npm view ${lib} dist-tags.latest --registry=https://registry.npm.taobao.org`, `${progressText} ${i + 1} / ${allLibraries.length}`)).trim()
+          latestVersions[lib] = JSON.parse((await execAsync(`npm view ${lib} dist-tags --registry=https://registry.npm.taobao.org`, `${progressText} ${i + 1} / ${allLibraries.length}`)))
         }
         try {
           const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString())
-          if (latestVersions[lib] !== dependencyPackageJsonContent.version) {
+          if (semver.lt(dependencyPackageJsonContent.version, latestVersions[lib].latest)) {
             libraries.push({
               name: lib,
-              version: core.getUpdatedVersion(dependencyObject[lib], latestVersions[lib])
+              version: core.getUpdatedVersion(dependencyObject[lib], latestVersions[lib].latest)
             })
+          } else if (semver.gt(dependencyPackageJsonContent.version, latestVersions[lib].latest)) {
+            for (const tag in latestVersions[lib]) {
+              if (tag !== 'latest' && semver.lt(dependencyPackageJsonContent.version, latestVersions[lib][tag])) {
+                libraries.push({
+                  name: lib,
+                  version: core.getUpdatedVersion(dependencyObject[lib], latestVersions[lib][tag])
+                })
+              }
+            }
           }
         } catch (error) {
           // do nothing if one package fails to update
         }
       }
       if (libraries.length > 0 && !argv.check) {
-        await execAsync(`cd ${projectPath} && yarn add ${libraries.map(d => d.name + '@' + d.version).join(' ')} -E ${parameter}`, progressText)
+        await execAsync(`cd ${projectPath} && yarn add ${libraries.map(d => d.name + '@' + d.version).join(' ')} -W -E ${parameter}`, progressText)
       }
     }
   }
@@ -167,7 +177,7 @@ async function executeCommandLine() {
         await execAsync(`cd ${project} && yarn`, `${progressText} ${project}`)
 
         if (argv.commit && dependencies.length + devDependencies.length + peerDependencies.length + childDependencies.length > 0) {
-          await execAsync(`cd ${project} && npm run build && npm run lint && git add -u && git commit -m "chore: update dependencies" && git push`, `${progressText} ${project}`)
+          await execAsync(`cd ${project} && yarn build && yarn lint && git add -u && git commit -m "chore: update dependencies" && git push`, `${progressText} ${project}`)
         }
       } else {
         for (const dependency of dependencies) {
