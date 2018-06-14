@@ -77,7 +77,7 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
           continue
         }
         if (!latestVersions[lib]) {
-          latestVersions[lib] = JSON.parse((await execAsync(`npm view ${lib} dist-tags --registry=https://registry.npm.taobao.org`, `${progressText} ${i + 1} / ${allLibraries.length}`)))
+          latestVersions[lib] = JSON.parse((await execAsync(`npm view ${lib} dist-tags --json --registry=https://registry.npm.taobao.org`, `${progressText} ${i + 1} / ${allLibraries.length}`)))
         }
         try {
           const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString())
