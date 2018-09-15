@@ -38,13 +38,11 @@ export function getUpdatedVersion(currentVersion: string, latestVersion: string)
 
   if (currentVersionParts.length === 1) {
     return latestMajor
-  } else if (currentVersionParts.length === 2) {
-    if (currentVersionParts[0] === '0') {
-      if (latestMajor === currentVersionParts[0]) {
-        return latestMajor + '.' + latestMinor
-      } else {
-        return latestMajor
-      }
+  } else if (currentVersionParts.length === 2 && currentVersionParts[0] === '0') {
+    if (latestMajor === currentVersionParts[0]) {
+      return latestMajor + '.' + latestMinor
+    } else {
+      return latestMajor
     }
   }
 
