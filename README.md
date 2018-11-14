@@ -6,6 +6,7 @@
 [![Build Status: Windows](https://ci.appveyor.com/api/projects/status/github/plantain-00/update-project?branch=master&svg=true)](https://ci.appveyor.com/project/plantain-00/update-project/branch/master)
 [![npm version](https://badge.fury.io/js/update-project.svg)](https://badge.fury.io/js/update-project)
 [![Downloads](https://img.shields.io/npm/dm/update-project.svg)](https://www.npmjs.com/package/update-project)
+[![type-coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fplantain-00%2Fupdate-project%2Fmaster%2Fpackage.json)](https://github.com/plantain-00/update-project)
 
 A CLI tool to update dependencies for projects.
 
