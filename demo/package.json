@@ -9,7 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "*",
-    "no-unused-export": "1.6.0",
+    "no-unused-export": "1.7.0",
     "perfect-scrollbar": "1",
     "select2-component": "5",
     "tslib": "1",
