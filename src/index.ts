@@ -207,6 +207,11 @@ async function executeCommandLine() {
         erroredProjects.push(project)
       }
     }
+
+    console.log(chalk.bold(`Errored ${erroredProjects.length} Projects:`))
+    for (const project of erroredProjects) {
+      console.log(chalk.red(project))
+    }
   }
   console.log(chalk.bold(`Errored ${erroredProjects.length} Projects:`))
   for (const project of erroredProjects) {
