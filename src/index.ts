@@ -52,10 +52,10 @@ const excludeLibName = 'exclude-lib'
 
 function getLibraries(dependencyArray: string[], argv: minimist.ParsedArgs) {
   if (argv.lib) {
-    const libraries = Array.isArray(argv.lib) ? argv.lib : [argv.lib]
+    const libraries: string[] = Array.isArray(argv.lib) ? argv.lib : [argv.lib]
     return dependencyArray.filter(d => libraries.includes(d))
   } else if (argv[excludeLibName]) {
-    const excludedLibraries = Array.isArray(argv[excludeLibName]) ? argv[excludeLibName] : [argv[excludeLibName]]
+    const excludedLibraries: string[] = Array.isArray(argv[excludeLibName]) ? argv[excludeLibName] : [argv[excludeLibName]]
     return dependencyArray.filter(d => !excludedLibraries.includes(d))
   } else {
     return dependencyArray
