@@ -105,7 +105,8 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
         }
       }
       if (libraries.length > 0 && !argv.check) {
-        await execAsync(`cd ${projectPath} && yarn add ${libraries.map(d => d.name + '@' + d.version).join(' ')} -W -E ${parameter}`, progressText)
+        const versions = libraries.map(d => `"${d.name}@${d.version}"`).join(' ')
+        await execAsync(`cd ${projectPath} && yarn add ${versions} -W -E ${parameter}`, progressText)
       }
     }
   }
