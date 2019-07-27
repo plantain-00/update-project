@@ -171,6 +171,8 @@ async function executeCommandLine() {
     const progressText = `${i + 1} / ${projects.length}`
     console.log(chalk.bold(`${progressText} ${project}...`))
     try {
+      await execAsync(`cd ${project} && git checkout master`, `${progressText} ${project}`)
+      await execAsync(`cd ${project} && git pull origin master --rebase`, `${progressText} ${project}`)
       const dependencies = await updateDependencies(p => p.dependencies, '', project, project, argv, `${progressText} ${project} dependency`)
       const devDependencies = await updateDependencies(p => p.devDependencies, '-D', project, project, argv, `${progressText} ${project} devDependency`)
       const peerDependencies = await updateDependencies(p => p.peerDependencies, '-P', project, project, argv, `${progressText} ${project} peerDependency`)
