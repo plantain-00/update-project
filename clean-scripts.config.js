@@ -14,8 +14,7 @@ module.exports = {
     ]
   ],
   lint: {
-    ts: `tslint ${tsFiles}`,
-    js: `standard ${jsFiles}`,
+    ts: `eslint --ext .js,.ts,.tsx ${tsFiles} ${jsFiles}`,
     export: `no-unused-export ${tsFiles}`,
     commit: `commitlint --from=HEAD~1`,
     markdown: `markdownlint README.md`,
@@ -27,8 +26,5 @@ module.exports = {
     'clean-release --config clean-run.config.js',
     () => checkGitStatus()
   ],
-  fix: {
-    ts: `tslint --fix ${tsFiles}`,
-    js: `standard --fix ${jsFiles}`
-  }
+  fix: `eslint --ext .js,.ts,.tsx ${tsFiles} ${jsFiles} --fix`
 }

@@ -66,7 +66,6 @@ function getLibraries(dependencyArray: string[], argv: minimist.ParsedArgs) {
   }
 }
 
-// tslint:disable-next-line:cognitive-complexity
 async function updateDependencies(getDependencies: (packageJsonContent: PackageJson) => { [name: string]: string }, parameter: string, project: string, projectPath: string, argv: minimist.ParsedArgs, progressText: string): Promise<Library[]> {
   const packageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/package.json`).toString())
   const dependencyObject = getDependencies(packageJsonContent)
@@ -141,7 +140,6 @@ async function updateChildDependencies(project: string, argv: minimist.ParsedArg
   return libraries
 }
 
-// tslint:disable-next-line:cognitive-complexity
 async function executeCommandLine() {
   const argv = minimist(process.argv.slice(2), { '--': true })
 

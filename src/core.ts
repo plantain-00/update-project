@@ -1,4 +1,3 @@
-// tslint:disable-next-line:cognitive-complexity
 export function getUpdatedVersion(currentVersion: string, latestVersion: string): string {
   if (currentVersion === '*') {
     return '*'

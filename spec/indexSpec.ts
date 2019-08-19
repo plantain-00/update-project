@@ -19,7 +19,6 @@ it('', () => {
   expect(core.getUpdatedVersion('1.0.0-rc.2', '1.2.3')).toEqual('1.2.3')
 
   expect(core.getUpdatedVersion('1 || 2', '2.3.4')).toEqual('1 || 2')
-  // tslint:disable-next-line:no-duplicate-string
   expect(core.getUpdatedVersion('1 || 2', '3.4.5')).toEqual('1 || 2 || 3')
   expect(core.getUpdatedVersion('1 || 2', '4.5.6')).toEqual('1 || 2 || 3 || 4')
 
