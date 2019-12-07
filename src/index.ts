@@ -83,7 +83,12 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
           latestVersions[lib] = JSON.parse((await execAsync(`npm view ${lib} dist-tags --json --registry=https://registry.npm.taobao.org`, `${progressText} ${i + 1} / ${allLibraries.length}`)))
         }
         try {
-          const dependencyPackageJsonContent: PackageJson = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString())
+          let dependencyPackageJsonContent: PackageJson
+          try {
+            dependencyPackageJsonContent = JSON.parse(fs.readFileSync(`${projectPath}/node_modules/${lib}/package.json`).toString())
+          } catch {
+            dependencyPackageJsonContent = JSON.parse(fs.readFileSync(`${project}/node_modules/${lib}/package.json`).toString())
+          }
           if (semver.lt(dependencyPackageJsonContent.version, latestVersions[lib].latest)) {
             libraries.push({
               name: lib,
