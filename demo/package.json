@@ -9,11 +9,11 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "*",
-    "no-unused-export": "1.10.2",
+    "no-unused-export": "1.10.3",
     "perfect-scrollbar": "1",
     "select2-component": "5",
     "tslib": "1",
     "uglify-js": "^2.8",
-    "xlsx": "0.15"
+    "xlsx": "0.16"
   }
 }
