@@ -48,7 +48,7 @@
     "chalk": "4.0.0",
     "glob": "7.1.6",
     "minimist": "1.2.5",
-    "rimraf": "3.0.2",
+    "optimize-yarn-lock": "1",
     "semver": "7.3.2",
     "tslib": "1.11.1"
   },

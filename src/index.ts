@@ -2,11 +2,10 @@ import minimist from 'minimist'
 import glob from 'glob'
 import * as fs from 'fs'
 import * as childProcess from 'child_process'
-import rimraf from 'rimraf'
 import * as core from './core'
-import * as util from 'util'
 import chalk from 'chalk'
 import * as semver from 'semver'
+import { optimize } from 'optimize-yarn-lock/dist/core'
 
 import * as packageJson from '../package.json'
 
@@ -15,8 +14,6 @@ let suppressError = false
 function showToolVersion() {
   console.log(`Version: ${packageJson.version}`)
 }
-
-const rimrafAsync = util.promisify(rimraf)
 
 function globAsync(pattern: string, ignore?: string | string[]) {
   return new Promise<string[]>((resolve, reject) => {
@@ -138,8 +135,7 @@ async function updateChildDependencies(project: string, argv: minimist.ParsedArg
         libraries.push(...peerDependencies)
 
         if (!argv.check) {
-          await rimrafAsync(`${newPath}/node_modules`)
-          await rimrafAsync(`${newPath}/yarn.lock`)
+          await optimize({ yarnLockPath: `${newPath}/yarn.lock` })
         }
       }
     }
@@ -186,8 +182,7 @@ async function executeCommandLine() {
       const childDependencies = await updateChildDependencies(project, argv, `${progressText} ${project} packages`)
 
       if (!argv.check) {
-        await rimrafAsync(`./${project}/node_modules`)
-        await rimrafAsync(`./${project}/yarn.lock`)
+        await optimize({ yarnLockPath: `./${project}/yarn.lock` })
         await execAsync(`cd ${project} && yarn`, `${progressText} ${project}`)
 
         if (argv.commit && dependencies.length + devDependencies.length + peerDependencies.length + childDependencies.length > 0) {
