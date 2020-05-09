@@ -46,6 +46,18 @@ function execAsync(script: string, progressText: string) {
   })
 }
 
+function existsAsync(path: string) {
+  return new Promise<boolean>((resolve) => {
+    fs.stat(path, (error, stats) => {
+      if (error) {
+        resolve(false)
+      } else {
+        resolve(stats.isFile())
+      }
+    })
+  })
+}
+
 const latestVersions: { [name: string]: { [tag: string]: string } } = {}
 type Library = { name: string, version: string }
 
@@ -135,7 +147,10 @@ async function updateChildDependencies(project: string, argv: minimist.ParsedArg
         libraries.push(...peerDependencies)
 
         if (!argv.check) {
-          await optimize({ yarnLockPath: `${newPath}/yarn.lock` })
+          const yarnLockPath = `${newPath}/yarn.lock`
+          if (await existsAsync(yarnLockPath)) {
+            await optimize({ yarnLockPath })
+          }
         }
       }
     }
@@ -182,7 +197,10 @@ async function executeCommandLine() {
       const childDependencies = await updateChildDependencies(project, argv, `${progressText} ${project} packages`)
 
       if (!argv.check) {
-        await optimize({ yarnLockPath: `./${project}/yarn.lock` })
+        const yarnLockPath = `./${project}/yarn.lock`
+        if (await existsAsync(yarnLockPath)) {
+          await optimize({ yarnLockPath })
+        }
         await execAsync(`cd ${project} && yarn`, `${progressText} ${project}`)
 
         if (argv.commit && dependencies.length + devDependencies.length + peerDependencies.length + childDependencies.length > 0) {
