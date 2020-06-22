@@ -33,3 +33,5 @@ name | type | description
 --exclude-lib | string | do not update the package, can be multiple
 --commit | boolean | after packages updated, run `npm run build && npm run lint`, commit local changes then push
 --check | boolean | just check which packages can be updated
+-h,--help | boolean | Print this message.
+-v,--version | boolean | Print the version

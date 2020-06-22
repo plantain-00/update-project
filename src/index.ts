@@ -15,6 +15,21 @@ function showToolVersion() {
   console.log(`Version: ${packageJson.version}`)
 }
 
+function showHelp() {
+  console.log(`Version ${packageJson.version}
+Syntax:   update-project [options] [file...]
+Examples: update-project **
+Options:
+ -h, --help                                         Print this message.
+ -v, --version                                      Print the version
+ --exclude-lib                                      Do not update the package, can be multiple
+ --exclude                                          Exclude a project, can be multiple
+ --lib                                              Just update the package, can be multiple
+ --commit                                           After packages updated, run npm run build && npm run lint, commit local changes then push
+ --check                                            Just check which packages can be updated
+`)
+}
+
 function globAsync(pattern: string, ignore?: string | string[]) {
   return new Promise<string[]>((resolve, reject) => {
     glob(pattern, { ignore }, (error, matches) => {
@@ -161,11 +176,26 @@ async function updateChildDependencies(project: string, argv: minimist.ParsedArg
 }
 
 async function executeCommandLine() {
-  const argv = minimist(process.argv.slice(2), { '--': true })
+  const argv = minimist(process.argv.slice(2), { '--': true }) as unknown as {
+    v?: unknown
+    version?: unknown
+    h?: unknown
+    help?: unknown
+    suppressError: boolean
+    _: string[]
+    exclude: string
+    check?: unknown
+    commit?: unknown
+  }
 
   const showVersion = argv.v || argv.version
   if (showVersion) {
     showToolVersion()
+    return
+  }
+
+  if (argv.h || argv.help) {
+    showHelp()
     return
   }
 
