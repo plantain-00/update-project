@@ -5,7 +5,7 @@ import * as childProcess from 'child_process'
 import * as core from './core'
 import chalk from 'chalk'
 import * as semver from 'semver'
-import { optimize } from 'optimize-yarn-lock/dist/core'
+import { optimize } from 'optimize-yarn-lock'
 
 import * as packageJson from '../package.json'
 
