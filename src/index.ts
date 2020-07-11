@@ -229,6 +229,7 @@ async function executeCommandLine() {
       if (!argv.check) {
         const yarnLockPath = `./${project}/yarn.lock`
         if (await existsAsync(yarnLockPath)) {
+          await execAsync(`cd ${project} && yarn upgrade`, `${progressText} ${project}`)
           await optimize({ yarnLockPath })
         }
         await execAsync(`cd ${project} && yarn`, `${progressText} ${project}`)
