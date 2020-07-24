@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.6.1](https://github.com/plantain-00/update-project/compare/v2.6.0...v2.6.1) (2020-07-25)
+  
+* fix: do not use lerna script ([9888668](https://github.com/plantain-00/update-project/commit/988866824b7852544a72e917330c59efc149cad0))
+* chore: update dependencies ([f4b4ce9](https://github.com/plantain-00/update-project/commit/f4b4ce97dce021d2aa10bfc79912b94c868cdf36)) ([859abc2](https://github.com/plantain-00/update-project/commit/859abc2be5e3aa95f5473ee329642f3d4714927e))
+* fix: ci failure ([2d2d765](https://github.com/plantain-00/update-project/commit/2d2d765de7e7b77f34c269d16129e4aee8cefa4d))
+* chore: add changelog ([56f8606](https://github.com/plantain-00/update-project/commit/56f86062472153093d2b5c1dc9c9554fb8561e95))
+* docs: add github ci badge ([7512980](https://github.com/plantain-00/update-project/commit/7512980d653d56210790d8b60b7c6dd38985bc61))
+
 ## [2.6.0](https://github.com/plantain-00/update-project/compare/v2.5.1...v2.6.0) (2020-07-11)
   
 * feat: yarn upgrade before optimize-yarn-lock ([c48d2be](https://github.com/plantain-00/update-project/commit/c48d2be616e3cb39f314757ce43b4aac757908d0))
