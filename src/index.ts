@@ -169,8 +169,6 @@ async function updateChildDependencies(project: string, argv: minimist.ParsedArg
         }
       }
     }
-
-    await execAsync(`cd ${project} && lerna bootstrap`, progressText)
   }
   return libraries
 }
