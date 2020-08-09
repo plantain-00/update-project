@@ -54,5 +54,8 @@
   },
   "bin": {
     "update-project": "bin/update-project"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
