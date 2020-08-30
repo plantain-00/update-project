@@ -132,7 +132,7 @@ async function updateDependencies(getDependencies: (packageJsonContent: PackageJ
               }
             }
           }
-        } catch (error) {
+        } catch {
           // do nothing if one package fails to update
         }
       }
@@ -257,9 +257,9 @@ async function executeCommandLine() {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.log(error)
-      if (error.code !== 0) {
+      if ((error as { code: number }).code !== 0) {
         erroredProjects.push(project)
       }
     }
