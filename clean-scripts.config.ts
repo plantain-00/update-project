@@ -20,8 +20,7 @@ export default {
   },
   test: [
     'ava',
-    'clean-release --config clean-run.config.ts',
-    () => checkGitStatus()
+    'clean-release --config clean-run.config.ts'
   ],
   fix: `eslint --ext .js,.ts,.tsx ${tsFiles} --fix`
 }
