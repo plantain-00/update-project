@@ -21,8 +21,14 @@ export function getUpdatedVersion(currentVersion: string, latestVersion: string)
     return latestVersion
   }
 
+  const currentVersionParts = currentVersion.split('.')
+  let verticalBarVersionParts: number[] | undefined
   if (currentVersion.includes('||') && !currentVersion.includes('.')) {
-    const verticalBarVersionParts = currentVersion.split('||').map(c => +c)
+    verticalBarVersionParts = currentVersion.split('||').map(c => +c)
+  } else if (currentVersionParts.length === 1) {
+    verticalBarVersionParts = currentVersionParts.map(c => +c)
+  }
+  if (verticalBarVersionParts) {
     if (verticalBarVersionParts.every(p => !isNaN(p))) {
       verticalBarVersionParts.sort((a, b) => a - b)
       for (let i = verticalBarVersionParts[verticalBarVersionParts.length - 1] + 1; i <= +latestMajor; i++) {
@@ -32,8 +38,6 @@ export function getUpdatedVersion(currentVersion: string, latestVersion: string)
     }
     return latestVersion
   }
-
-  const currentVersionParts = currentVersion.split('.')
 
   if (currentVersionParts.length === 1) {
     return latestMajor

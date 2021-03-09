@@ -6,7 +6,7 @@ test('getUpdatedVersion', (t) => {
   t.is(core.getUpdatedVersion('*', '1.2.3'), '*')
 
   t.is(core.getUpdatedVersion('1', '1.2.3'), '1')
-  t.is(core.getUpdatedVersion('1', '2.3.4'), '2')
+  t.is(core.getUpdatedVersion('1', '2.3.4'), '1 || 2')
 
   t.is(core.getUpdatedVersion('^1.2', '1.2.3'), '^1.2')
   t.is(core.getUpdatedVersion('^1.2', '1.3.4'), '^1.2')
