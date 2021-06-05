@@ -2,7 +2,6 @@
 
 [![Dependency Status](https://david-dm.org/plantain-00/update-project.svg)](https://david-dm.org/plantain-00/update-project)
 [![devDependency Status](https://david-dm.org/plantain-00/update-project/dev-status.svg)](https://david-dm.org/plantain-00/update-project#info=devDependencies)
-[![Build Status: Linux](https://travis-ci.org/plantain-00/update-project.svg?branch=master)](https://travis-ci.org/plantain-00/update-project)
 [![Build Status: Windows](https://ci.appveyor.com/api/projects/status/github/plantain-00/update-project?branch=master&svg=true)](https://ci.appveyor.com/project/plantain-00/update-project/branch/master)
 ![Github CI](https://github.com/plantain-00/update-project/workflows/Github%20CI/badge.svg)
 [![npm version](https://badge.fury.io/js/update-project.svg)](https://badge.fury.io/js/update-project)
